@@ -1,5 +1,5 @@
 body {
-  font-family: 'Comic Sans MS', cursive, sans-serif;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
   background: #fdf6e3;
   color: #333;
   text-align: center;
@@ -84,7 +84,7 @@ button:hover {
 .home-link {
   display: inline-block;
   margin-top: 40px;
-  font-family: 'Comic Sans MS', cursive;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
   font-size: 20px;
   text-decoration: none;
   color: #333;
