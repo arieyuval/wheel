@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>📺 What We Watching</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>📺 What We Watching</h1>
+
+  <form onsubmit="addItem(event)">
+    <input type="text" id="item-input" placeholder="Add a restaurant..." />
+    <button type="submit">Add</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Place</th>
+        <th>Hila</th>
+        <th>Yuval</th>
+      </tr>
+    </thead>
+    <tbody id="item-body"></tbody>
+  </table>
+
+  <button onclick="spinWheel()">🎯 Spin the Wheel!</button>
+
+  <div class="wheel-container">
+    <div id="pointer">▼</div>
+    <canvas id="wheel" width="400" height="400"></canvas>
+  </div>
+
+  <a href="index.html" style="
+    display: inline-block;
+    margin-top: 40px;
+    font-family: 'Comic Sans MS', cursive;
+    font-size: 20px;
+    text-decoration: none;
+    color: #333;
+    background: #ffd966;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+  ">⬅️ Back to Home</a>
+
+  <script src="script.js"></script>
+  <script>
+    const defaultList = [
+      "Love Island",
+      "HIMYM",
+      "Disney Movie",
+      "Good Will Hunting",
+      "Tangled",
+      "Serious Movie",
+      "Hila Fav ep",
+      "Yuval Fav ep",
+    ];
+
+    window.addEventListener("DOMContentLoaded", () => {
+      defaultList.forEach(name => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${name}</td>
+          <td><input type="checkbox" class="hila"></td>
+          <td><input type="checkbox" class="yuval"></td>
+        `;
+        document.getElementById("item-body").appendChild(row);
+        row.querySelector(".hila").addEventListener("change", drawWheel);
+        row.querySelector(".yuval").addEventListener("change", drawWheel);
+      });
+      drawWheel();
+    });
+  </script>
+</body>
+</html>

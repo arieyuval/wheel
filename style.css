@@ -1,0 +1,99 @@
+body {
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  background: #fdf6e3;
+  color: #333;
+  text-align: center;
+  padding: 20px;
+  margin: 0;
+}
+
+table {
+  margin: 20px auto;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px 20px;
+  border: 1px solid #aaa;
+}
+
+input[type="text"] {
+  padding: 8px;
+  font-size: 1em;
+  width: 200px;
+}
+
+button {
+  padding: 10px 15px;
+  margin-top: 10px;
+  font-size: 1em;
+  background-color: #ffcc00;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background-color: #ffaa00;
+}
+
+.wheel-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+}
+
+#wheel {
+  border: 2px solid #333;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+#pointer {
+  position: absolute;
+  top: -30px;
+  font-size: 40px;
+  color: red;
+  z-index: 10;
+}
+
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 30px;
+}
+
+.nav-grid a {
+  text-decoration: none;
+  background-color: #ffd966;
+  padding: 20px;
+  border-radius: 10px;
+  font-size: 20px;
+  color: #333;
+  transition: background 0.2s;
+}
+
+.nav-grid a:hover {
+  background-color: #ffbb33;
+}
+
+.home-link {
+  display: inline-block;
+  margin-top: 40px;
+  font-family: 'Comic Sans MS', cursive;
+  font-size: 20px;
+  text-decoration: none;
+  color: #333;
+  background: #ffd966;
+  padding: 10px 20px;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
+
+.home-link:hover {
+  background-color: #ffbb33;
+}
