@@ -119,44 +119,13 @@
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Test connection
-    try {
-      const { error } = await supabase.from("bucket_items").select("*").limit(1);
-      if (error) {
-        console.error("❌ Supabase connection failed:", error.message);
-      } else {
-        console.log("✅ Supabase connected successfully!");
-      }
-    } catch (err) {
-      console.error("❌ Error connecting to Supabase:", err);
-    }
-
+    // Load items from a given category
     async function loadCategory(cat) {
       const ul = document.querySelector(`[data-list-${cat}]`);
       ul.innerHTML = "";
       const { data, error } = await supabase
         .from("bucket_items")
-        .select("item")
-        .eq("category", cat);
-
-      if (error) {
-        console.error(`Error loading category ${cat}:`, error.message);
-        return;
-      }
-
-      data.forEach(({ item }) => {
-        const li = document.createElement("li");
-        li.textContent = item;
-        ul.appendChild(li);
-      });
-    }
-
-    async function loadCategory(cat) {
-      const ul = document.querySelector(`[data-list-${cat}]`);
-      ul.innerHTML = "";
-      const { data, error } = await supabase
-        .from("bucket_items")
-        .select("id, item") // include id for deletion
+        .select("id, item")
         .eq("category", cat);
 
       if (error) {
@@ -168,7 +137,6 @@
         const li = document.createElement("li");
         li.textContent = item;
 
-        // Create delete button
         const delBtn = document.createElement("button");
         delBtn.textContent = "❌";
         delBtn.style.marginLeft = "10px";
@@ -178,7 +146,6 @@
         delBtn.style.cursor = "pointer";
         delBtn.title = "Delete item";
 
-        // Delete handler
         delBtn.addEventListener("click", async () => {
           const { error: delError } = await supabase
             .from("bucket_items")
@@ -188,7 +155,7 @@
           if (delError) {
             console.error("Delete error:", delError.message);
           } else {
-            loadCategory(cat); // refresh list
+            loadCategory(cat);
           }
         });
 
@@ -197,6 +164,7 @@
       });
     }
 
+    // Handle adding new items
     document.querySelectorAll("form[data-cat]").forEach(form => {
       const cat = form.dataset.cat;
       form.addEventListener("submit", async (e) => {
