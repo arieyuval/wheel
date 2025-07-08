@@ -45,7 +45,7 @@
     border-radius: 10px;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
   ">⬅️ Back to Home</a>
-
+<!-- 
   <script src="script.js"></script>
   <script>
     const defaultList = [
@@ -73,6 +73,63 @@
       });
       drawWheel();
     });
-  </script>
+  </script> -->
+  <script src="script.js"></script>
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+  const supabase = createClient(
+    "https://mudusurnywurspztmtha.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11ZHVzdXJueXd1cnNwenRtdGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MzgwNDEsImV4cCI6MjA2NzUxNDA0MX0.F2mr6cmfcNzChGrqHRVyHlSsEJ2yEBkSaJBZr6547Sc"
+  );
+
+  const defaultList = [
+    "Inception",
+    "The Office",
+    "Breaking Bad",
+    "Brooklyn Nine-Nine",
+    "Spider-Man: Into the Spider-Verse",
+    "Oppenheimer"
+  ];
+
+  const addedItems = new Set();
+
+  function createRow(name) {
+    const normalized = name.trim().toLowerCase();
+    if (addedItems.has(normalized)) return;
+    addedItems.add(normalized);
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${name}</td>
+      <td><input type="checkbox" class="hila"></td>
+      <td><input type="checkbox" class="yuval"></td>
+    `;
+    document.getElementById("item-body").appendChild(row);
+    row.querySelector(".hila").addEventListener("change", drawWheel);
+    row.querySelector(".yuval").addEventListener("change", drawWheel);
+  }
+
+  async function loadBucketItems() {
+    const { data, error } = await supabase
+      .from("bucket_items")
+      .select("item")
+      .eq("category", "watch");
+
+    if (error) {
+      console.error("❌ Supabase error:", error.message);
+      return;
+    }
+
+    data.forEach(({ item }) => createRow(item));
+  }
+
+  window.addEventListener("DOMContentLoaded", async () => {
+    defaultList.forEach(createRow);
+    await loadBucketItems();
+    drawWheel();
+  });
+</script>
+
 </body>
 </html>

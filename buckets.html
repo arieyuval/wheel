@@ -151,6 +151,52 @@
       });
     }
 
+    async function loadCategory(cat) {
+      const ul = document.querySelector(`[data-list-${cat}]`);
+      ul.innerHTML = "";
+      const { data, error } = await supabase
+        .from("bucket_items")
+        .select("id, item") // include id for deletion
+        .eq("category", cat);
+
+      if (error) {
+        console.error(`Error loading category ${cat}:`, error.message);
+        return;
+      }
+
+      data.forEach(({ id, item }) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+
+        // Create delete button
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "❌";
+        delBtn.style.marginLeft = "10px";
+        delBtn.style.color = "red";
+        delBtn.style.background = "none";
+        delBtn.style.border = "none";
+        delBtn.style.cursor = "pointer";
+        delBtn.title = "Delete item";
+
+        // Delete handler
+        delBtn.addEventListener("click", async () => {
+          const { error: delError } = await supabase
+            .from("bucket_items")
+            .delete()
+            .eq("id", id);
+
+          if (delError) {
+            console.error("Delete error:", delError.message);
+          } else {
+            loadCategory(cat); // refresh list
+          }
+        });
+
+        li.appendChild(delBtn);
+        ul.appendChild(li);
+      });
+    }
+
     document.querySelectorAll("form[data-cat]").forEach(form => {
       const cat = form.dataset.cat;
       form.addEventListener("submit", async (e) => {

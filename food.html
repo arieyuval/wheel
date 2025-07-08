@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -75,4 +75,117 @@
     });
   </script>
 </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
+  <title>🍔 Food</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>🍔 What We Eatin'</h1>
+
+  <form onsubmit="addItem(event)">
+    <input type="text" id="item-input" placeholder="Add a restaurant..." />
+    <button type="submit">Add</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Place</th>
+        <th>Hila</th>
+        <th>Yuval</th>
+      </tr>
+    </thead>
+    <tbody id="item-body"></tbody>
+  </table>
+
+  <button onclick="spinWheel()">🎯 Spin the Wheel!</button>
+
+  <div class="wheel-container">
+    <div id="pointer">▼</div>
+    <canvas id="wheel" width="400" height="400"></canvas>
+  </div>
+
+  <a href="index.html" style="
+    display: inline-block;
+    margin-top: 40px;
+    font-family: 'Comic Sans MS', 'Comic Sans', 'Comic Neue', cursive;
+    font-size: 20px;
+    text-decoration: none;
+    color: #333;
+    background: #ffd966;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+  ">⬅️ Back to Home</a>
+
+  <script src="script.js"></script>
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+    const SUPABASE_URL = "https://mudusurnywurspztmtha.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11ZHVzdXJueXd1cnNwenRtdGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MzgwNDEsImV4cCI6MjA2NzUxNDA0MX0.F2mr6cmfcNzChGrqHRVyHlSsEJ2yEBkSaJBZr6547Sc";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const defaultList = [
+      "Chik-Fil-A",
+      "Ezell's Chicken",
+      "Chipotle",
+      "Pagliacci Pizza",
+      "McDonalds",
+      "Wingstop",
+      "Due' Cucina",
+      "Try New Random Place"
+    ];
+
+    const addedItems = new Set();
+
+    function createRow(name) {
+      const normalized = name.trim().toLowerCase();
+      if (addedItems.has(normalized)) return;
+
+      addedItems.add(normalized);
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${name}</td>
+        <td><input type="checkbox" class="hila"></td>
+        <td><input type="checkbox" class="yuval"></td>
+      `;
+      document.getElementById("item-body").appendChild(row);
+
+      row.querySelector(".hila").addEventListener("change", drawWheel);
+      row.querySelector(".yuval").addEventListener("change", drawWheel);
+    }
+
+    async function loadBucketItems() {
+      const { data, error } = await supabase
+        .from("bucket_items")
+        .select("item")
+        .eq("category", "eat");
+
+      if (error) {
+        console.error("❌ Error loading Supabase bucket items:", error.message);
+        return;
+      }
+
+      data.forEach(({ item }) => {
+        createRow(item);
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      defaultList.forEach(createRow);
+      await loadBucketItems();
+      drawWheel();
+    });
+  </script>
+</body>
 </html>
+
