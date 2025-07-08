@@ -116,12 +116,12 @@
     const ctx = canvas.getContext("2d");
 
     // ✅ Handle Retina displays (high-res canvas)
-    const scale = window.devicePixelRatio || 1;
-    canvas.width = 800 * scale;
-    canvas.height = 600 * scale;
-    canvas.style.width = "800px";
-    canvas.style.height = "600px";
-    ctx.scale(scale, scale);
+    // const scale = window.devicePixelRatio || 1;
+    // canvas.width = 800 * scale;
+    // canvas.height = 600 * scale;
+    // canvas.style.width = "800px";
+    // canvas.style.height = "600px";
+    // ctx.scale(scale, scale);
 
     async function loadWordCloud() {
       const { data, error } = await supabase
@@ -138,8 +138,8 @@
 
       WordCloud(canvas, {
         list,
-        gridSize: 4,
-        weightFactor: (count) => Math.pow(count, 1.5),
+        gridSize: 2, // smaller = denser cloud
+        weightFactor: (count) => count * 10, // bigger multiplier = fills box better
         rotateRatio: 0.5,
         rotationSteps: 4,
         backgroundColor: "#ffe9f3",
