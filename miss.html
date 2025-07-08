@@ -45,19 +45,20 @@
     }
 
     #word-cloud {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
       justify-content: center;
-      align-items: center; /* vertically align items */
+      align-items: center;
       gap: 15px;
-      max-width: 600px; /* limit width */
-      min-height: 300px; /* add height */
+      max-width: 700px;
+      min-height: 350px;
       margin: 0 auto 30px;
-      padding: 20px;
+      padding: 30px;
       border-radius: 20px;
-      background-color: #ffe9f3; /* soft background box */
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); /* subtle shadow */
+      background-color: #ffe9f3;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
     }
+
 
     .word {
       font-weight: bold;
@@ -170,6 +171,9 @@
         const fontSize = 16 + (count / maxCount) * 30;
         span.textContent = word;
         span.className = "word";
+        if (Math.random() < 0.3) {
+          span.style.transform = `rotate(${Math.random() < 0.5 ? '-' : ''}15deg)`;
+        }
         span.style.fontSize = `${fontSize}px`;
         span.style.color = colors[Math.floor(Math.random() * colors.length)];
         cloudEl.appendChild(span);
