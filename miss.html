@@ -5,89 +5,205 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>I Miss You</title>
   <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body style="font-family: 'Comic Neue', 'Comic Sans MS', 'Comic Sans', cursive; text-align:center; padding:20px;">
+  <style>
+    body {
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+      padding: 20px;
+      background: #fff3f3;
+      text-align: center;
+    }
 
-  <h1 id="countdown" style="font-size:48px;"></h1>
-  <h2 style="font-size:32px; margin-top:20px;">What we miss most</h2>
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    #countdown {
+      font-size: 2.2rem;
+      color: #e63946;
+      margin-bottom: 40px;
+    }
+
+    #word-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      max-width: 90%;
+      margin: 0 auto 30px;
+    }
+
+    .word {
+      font-weight: bold;
+      transition: transform 0.2s;
+    }
+
+    .word:hover {
+      transform: scale(1.2);
+    }
+
+    #word-form {
+      margin-top: 30px;
+    }
+
+    #word-form input {
+      padding: 8px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 250px;
+    }
+
+    #word-form button {
+      padding: 8px 14px;
+      margin-left: 10px;
+      font-size: 1rem;
+      border: none;
+      background-color: #ff7b54;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #word-form button:hover {
+      background-color: #ff5a36;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>⏳ Countdown</h1>
+  <div id="countdown">Loading...</div>
+
+  <h2 style="font-size: 2rem; margin-bottom: 20px;">💭 What We Miss Most</h2>
+  <div id="word-cloud">Loading word cloud...</div>
 
   <form id="word-form">
-    <input type="text" id="word-input" placeholder="Add something you miss" required 
-           style="padding:10px; width:80%; max-width:400px; margin-top:20px;">
-    <button type="submit" style="padding:10px 20px; margin-left:10px;">Add</button>
+    <input type="text" id="new-word" placeholder="Add a word..." required />
+    <button type="submit">➕ Add</button>
   </form>
 
-  <div id="word-cloud" style="margin-top:30px; width:90%; max-width:600px; margin:auto;"></div>
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    // Supabase init
     const SUPABASE_URL = "https://mudusurnywurspztmtha.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11ZHVzdXJueXd1cnNwenRtdGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MzgwNDEsImV4cCI6MjA2NzUxNDA0MX0.F2mr6cmfcNzChGrqHRVyHlSsEJ2yEBkSaJBZr6547Sc";
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 1. Countdown
+    // ✅ Test Supabase connection
+    try {
+      const { error } = await supabase.from("word_cloud").select("*").limit(1);
+      if (error) {
+        console.error("❌ Supabase connection failed:", error.message);
+      } else {
+        console.log("✅ Supabase connected successfully!");
+      }
+    } catch (err) {
+      console.error("❌ Error connecting to Supabase:", err);
+    }
+
+    // ⏳ Countdown Setup
     const targetDate = new Date("2026-01-01T00:00:00");
     const countdownEl = document.getElementById("countdown");
+
     function updateCountdown() {
       const now = new Date();
       const diff = targetDate - now;
+
       if (diff <= 0) {
-        countdownEl.textContent = "We're there!";
+        countdownEl.textContent = "It's time! 🎉";
         return;
       }
-      const days = Math.floor(diff / 86400000),
-            hrs  = Math.floor((diff % 86400000) / 3600000),
-            mins = Math.floor((diff % 3600000) / 60000),
-            secs = Math.floor((diff % 60000) / 1000);
-      countdownEl.textContent = `${days}d ${hrs}h ${mins}m ${secs}s`;
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      countdownEl.textContent = `${days} days, ${hours}h ${minutes}m ${seconds}s`;
     }
+
     setInterval(updateCountdown, 1000);
-    updateCountdown();
+    updateCountdown(); // initial run
 
-    // 2. Word Cloud
-    const form = document.getElementById("word-form");
-    const input = document.getElementById("word-input");
-    const cloudDiv = document.getElementById("word-cloud");
+    // ☁️ Word Cloud
+    async function loadWordCloud() {
+      const cloudEl = document.getElementById("word-cloud");
+      cloudEl.innerHTML = "";
 
-    async function fetchWords() {
       const { data, error } = await supabase
-        .from("word_cloud_entries")
-        .select("word, count");
-      return data || [];
-    }
+        .from("word_cloud")
+        .select("word, count")
+        .order("count", { ascending: false });
 
-    function renderCloud(words) {
-      cloudDiv.innerHTML = "";
-      words.sort((a,b) => b.count - a.count);
-      const max = words[0]?.count || 1;
-      words.forEach(({ word, count }) => {
-        const size = 16 + (count / max) * 40;
+      if (error) {
+        console.error("Failed to load word cloud:", error.message);
+        cloudEl.textContent = "Failed to load word cloud.";
+        return;
+      }
+
+      const colors = ["#ff6b6b", "#f7b32b", "#06d6a0", "#4ea8de", "#f72585", "#8338ec"];
+      const maxCount = Math.max(...data.map(w => w.count), 1);
+
+      data.forEach(({ word, count }) => {
         const span = document.createElement("span");
+        const fontSize = 16 + (count / maxCount) * 30;
         span.textContent = word;
-        span.style.fontSize = size + "px";
-        span.style.margin = "5px";
-        span.style.color = `hsl(${Math.random()*360},60%,40%)`;
-        cloudDiv.appendChild(span);
+        span.className = "word";
+        span.style.fontSize = `${fontSize}px`;
+        span.style.color = colors[Math.floor(Math.random() * colors.length)];
+        cloudEl.appendChild(span);
       });
     }
 
-    async function loadAndShowWords() {
-      const words = await fetchWords();
-      renderCloud(words);
-    }
-
-    form.addEventListener("submit", async (e) => {
+    // 📝 Handle submission
+    document.getElementById("word-form").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const w = input.value.trim();
-      if (!w) return;
-      await supabase.rpc("increment_word", { w });
+      const input = document.getElementById("new-word");
+      const word = input.value.trim();
+
+      if (!word) return;
+
+      // Check if word already exists
+      const { data, error } = await supabase
+        .from("word_cloud")
+        .select("id, count")
+        .eq("word", word)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Fetch error:", error.message);
+        return;
+      }
+
+      if (data) {
+        // Word exists, update count
+        const { error: updateError } = await supabase
+          .from("word_cloud")
+          .update({ count: data.count + 1 })
+          .eq("id", data.id);
+
+        if (updateError) {
+          console.error("Update error:", updateError.message);
+          return;
+        }
+      } else {
+        // Insert new word
+        const { error: insertError } = await supabase
+          .from("word_cloud")
+          .insert([{ word, count: 1 }]);
+
+        if (insertError) {
+          console.error("Insert error:", insertError.message);
+          return;
+        }
+      }
+
       input.value = "";
-      loadAndShowWords();
+      loadWordCloud();
     });
 
-    loadAndShowWords();
+    loadWordCloud();
   </script>
 </body>
 </html>
