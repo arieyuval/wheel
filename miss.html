@@ -87,7 +87,7 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
     const SUPABASE_URL = 'https://mudusurnywurspztmtha.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11ZHVzdXJueXd1cnNwenRtdGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MzgwNDEsImV4cCI6MjA2NzUxNDA0MX0.F2mr6cmfcNzChGrqHRVyHlSsEJ2yEBkSaJBZr6547Sc'; // your key
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11ZHVzdXJueXd1cnNwenRtdGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MzgwNDEsImV4cCI6MjA2NzUxNDA0MX0.F2mr6cmfcNzChGrqHRVyHlSsEJ2yEBkSaJBZr6547Sc'; // use your full anon key
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const wordcloudCanvas = document.getElementById('wordcloud');
@@ -110,7 +110,7 @@
         rotateRatio: 0.5,
         rotationSteps: 2,
         backgroundColor: '#fff0f5',
-        shape: 'heart',
+        shape: 'circle' // ✅ RESTORED to default shape
       });
     }
 
@@ -125,7 +125,6 @@
       const word = input.value.trim();
       if (!word) return;
 
-      // Check if word exists
       const { data, error } = await supabase
         .from("word_cloud")
         .select("count")
@@ -163,7 +162,6 @@
       document.getElementById("minutes").textContent = minutes.toString().padStart(2, '0');
       document.getElementById("seconds").textContent = seconds.toString().padStart(2, '0');
     }
-
 
     updateCountdown();
     setInterval(updateCountdown, 1000);
