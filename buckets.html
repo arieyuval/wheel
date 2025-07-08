@@ -2,49 +2,130 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Bucket Lists</title>
-  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🎯 Our Buckets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+      background-color: #fffbea;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 30px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    .bucket {
+      background-color: #fff4cc;
+      border: 2px solid #ffd966;
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .bucket h2 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    .bucket form {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+      gap: 5px;
+    }
+
+    .bucket input {
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      flex: 1;
+      font-size: 14px;
+    }
+
+    .bucket button {
+      background-color: #ffda70;
+      border: none;
+      padding: 6px 10px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .bucket ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 10px;
+      text-align: left;
+    }
+
+    .bucket li {
+      background-color: white;
+      margin: 4px 0;
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: 1px solid #eee;
+      font-size: 14px;
+    }
+  </style>
 </head>
-<body style="font-family: 'Comic Neue', 'Comic Sans MS', 'Comic Sans', cursive; padding:20px; display:grid; grid-template-columns:1fr; gap:30px;">
+<body>
+  <h1>🪣 Our Bucket List</h1>
 
-  <div class="bucket">
-    <h2>I can't wait to watch:</h2>
-    <form data-cat="watch">
-      <input placeholder="Add show/movie" required>
-      <button>Add</button>
-    </form>
-    <ul data-list-watch></ul>
+  <div class="grid">
+    <div class="bucket">
+      <h2>🎬 I can't wait to watch:</h2>
+      <form data-cat="watch">
+        <input placeholder="Add show/movie" required />
+        <button>+</button>
+      </form>
+      <ul data-list-watch></ul>
+    </div>
+
+    <div class="bucket">
+      <h2>🍽️ I can't wait to eat:</h2>
+      <form data-cat="eat">
+        <input placeholder="Add food" required />
+        <button>+</button>
+      </form>
+      <ul data-list-eat></ul>
+    </div>
+
+    <div class="bucket">
+      <h2>📍 I can't wait to go to:</h2>
+      <form data-cat="go">
+        <input placeholder="Add place" required />
+        <button>+</button>
+      </form>
+      <ul data-list-go></ul>
+    </div>
+
+    <div class="bucket">
+      <h2>🎉 I can't wait to do:</h2>
+      <form data-cat="do">
+        <input placeholder="Add activity" required />
+        <button>+</button>
+      </form>
+      <ul data-list-do></ul>
+    </div>
   </div>
 
-  <div class="bucket">
-    <h2>I can't wait to eat:</h2>
-    <form data-cat="eat">
-      <input placeholder="Add food" required>
-      <button>Add</button>
-    </form>
-    <ul data-list-eat></ul>
-  </div>
-
-  <div class="bucket">
-    <h2>I can't wait to go to:</h2>
-    <form data-cat="go">
-      <input placeholder="Add place" required>
-      <button>Add</button>
-    </form>
-    <ul data-list-go></ul>
-  </div>
-
-  <div class="bucket">
-    <h2>I can't wait to do:</h2>
-    <form data-cat="do">
-      <input placeholder="Add activity" required>
-      <button>Add</button>
-    </form>
-    <ul data-list-do></ul>
-  </div>
-
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://mudusurnywurspztmtha.supabase.co";
@@ -55,12 +136,12 @@
       const ul = document.querySelector(`[data-list-${cat}]`);
       ul.innerHTML = "";
       const { data, error } = await supabase
-        .from("bucket_list_items")
+        .from("bucket_items")
         .select("description")
         .eq("category", cat);
 
       if (error) {
-        console.error(`Error loading ${cat} items:`, error);
+        console.error("Fetch error:", error);
         return;
       }
 
@@ -80,16 +161,15 @@
         if (!val) return;
 
         const { error } = await supabase
-          .from("bucket_list_items")
+          .from("bucket_items")
           .insert([{ category: cat, description: val }]);
 
         if (error) {
-          console.error(`Error inserting ${cat} item:`, error);
-          return;
+          console.error("Insert error:", error);
+        } else {
+          input.value = "";
+          loadCategory(cat);
         }
-
-        input.value = "";
-        loadCategory(cat);
       });
     });
 
