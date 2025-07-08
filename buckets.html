@@ -15,7 +15,7 @@
       <input placeholder="Add show/movie" required>
       <button>Add</button>
     </form>
-    <ul data-list-watch style="list-style:none; padding:0;"></ul>
+    <ul data-list-watch></ul>
   </div>
 
   <div class="bucket">
@@ -24,7 +24,7 @@
       <input placeholder="Add food" required>
       <button>Add</button>
     </form>
-    <ul data-list-eat style="list-style:none; padding:0;"></ul>
+    <ul data-list-eat></ul>
   </div>
 
   <div class="bucket">
@@ -33,7 +33,7 @@
       <input placeholder="Add place" required>
       <button>Add</button>
     </form>
-    <ul data-list-go style="list-style:none; padding:0;"></ul>
+    <ul data-list-go></ul>
   </div>
 
   <div class="bucket">
@@ -42,7 +42,7 @@
       <input placeholder="Add activity" required>
       <button>Add</button>
     </form>
-    <ul data-list-do style="list-style:none; padding:0;"></ul>
+    <ul data-list-do></ul>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -54,10 +54,16 @@
     async function loadCategory(cat) {
       const ul = document.querySelector(`[data-list-${cat}]`);
       ul.innerHTML = "";
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("bucket_list_items")
         .select("description")
         .eq("category", cat);
+
+      if (error) {
+        console.error(`Error loading ${cat} items:`, error);
+        return;
+      }
+
       data.forEach(({ description }) => {
         const li = document.createElement("li");
         li.textContent = description;
@@ -69,16 +75,25 @@
       const cat = form.dataset.cat;
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const val = form.querySelector("input").value.trim();
+        const input = form.querySelector("input");
+        const val = input.value.trim();
         if (!val) return;
-        await supabase.from("bucket_list_items").insert([{ category: cat, description: val }]);
-        form.reset();
+
+        const { error } = await supabase
+          .from("bucket_list_items")
+          .insert([{ category: cat, description: val }]);
+
+        if (error) {
+          console.error(`Error inserting ${cat} item:`, error);
+          return;
+        }
+
+        input.value = "";
         loadCategory(cat);
       });
     });
 
-    // On load, fetch all
-    ["watch","eat","go","do"].forEach(loadCategory);
+    ["watch", "eat", "go", "do"].forEach(loadCategory);
   </script>
 </body>
 </html>
