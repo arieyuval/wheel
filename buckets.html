@@ -70,7 +70,7 @@
 </head>
 <body>
 
-  <h1 style="text-align:center; font-size: 2rem;">🎯 Our Bucket Lists</h1>
+  <h1 style="text-align:center; font-size: 2rem;">🎯 Our Bucket Lists 🎯</h1>
 
   <div class="grid">
     <div class="bucket">
@@ -136,7 +136,7 @@
       ul.innerHTML = "";
       const { data, error } = await supabase
         .from("bucket_items")
-        .select("description")
+        .select("item")
         .eq("category", cat);
 
       if (error) {
@@ -144,9 +144,9 @@
         return;
       }
 
-      data.forEach(({ description }) => {
+      data.forEach(({ item }) => {
         const li = document.createElement("li");
-        li.textContent = description;
+        li.textContent = item;
         ul.appendChild(li);
       });
     }
@@ -161,7 +161,7 @@
 
         const { error } = await supabase
           .from("bucket_items")
-          .insert([{ category: cat, description: val }]);
+          .insert([{ category: cat, item: val }]);
 
         if (error) {
           console.error("Insert error:", error.message);
