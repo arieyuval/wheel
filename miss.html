@@ -96,7 +96,7 @@
   </div>
 
   <h2 style="font-size: 2rem;">💭 What We Miss Most</h2>
-  <canvas id="wordcloud" width="800" height="600"></canvas>
+  <canvas id="wordcloud" width="600" height="400"></canvas>
 
   <form id="word-form">
     <input type="text" id="new-word" placeholder="Add a word..." required />
@@ -138,19 +138,19 @@
 
       WordCloud(canvas, {
         list,
-        gridSize: 1.5, // smaller = denser cloud
-        weightFactor: (count) => 10 + count * 10, // bigger multiplier = fills box better
-        rotateRatio: 0.6,
+        gridSize: 1, // super tight
+        weightFactor: (count) => 20 + count * 12,
+        minSize: 18, // prevent tiny words
         rotationSteps: 4,
+        rotateRatio: 0.6,
         backgroundColor: "#ffe9f3",
         color: () => `hsl(${Math.random() * 360}, 70%, 45%)`,
         drawOutOfBound: false,
         shape: "circle",
         shuffle: true,
         fontFamily: "'Comic Neue', 'Comic Sans MS', cursive",
-        ellipticity: 1,
-        minSize: 14,
       });
+
     }
 
     document.getElementById("word-form").addEventListener("submit", async (e) => {
