@@ -2,90 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>🎯 Our Buckets</title>
-  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bucket Lists</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
   <style>
     body {
       font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-      background-color: #fffbea;
-      margin: 0;
       padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 30px;
+      background: #fffbe6;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 25px;
-      width: 100%;
-      max-width: 1000px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
     }
 
     .bucket {
-      background-color: #fff4cc;
-      border: 2px solid #ffd966;
-      border-radius: 20px;
+      background: #fff9d6;
+      border: 2px solid #ffda77;
+      border-radius: 15px;
       padding: 20px;
-      text-align: center;
-      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     .bucket h2 {
-      font-size: 1.2rem;
+      font-size: 1.4rem;
       margin-bottom: 10px;
     }
 
-    .bucket form {
+    form {
       display: flex;
-      justify-content: center;
-      margin-bottom: 10px;
-      gap: 5px;
+      gap: 10px;
+      margin-bottom: 15px;
     }
 
-    .bucket input {
-      padding: 6px;
+    form input {
+      flex: 1;
+      padding: 8px;
       border-radius: 8px;
       border: 1px solid #ccc;
-      flex: 1;
-      font-size: 14px;
     }
 
-    .bucket button {
-      background-color: #ffda70;
+    form button {
+      padding: 8px 14px;
       border: none;
-      padding: 6px 10px;
-      font-size: 14px;
+      background-color: #ffb347;
+      color: white;
       border-radius: 8px;
       cursor: pointer;
     }
 
-    .bucket ul {
-      list-style: none;
-      padding: 0;
-      margin-top: 10px;
-      text-align: left;
+    form button:hover {
+      background-color: #ffa22e;
     }
 
-    .bucket li {
-      background-color: white;
-      margin: 4px 0;
-      padding: 6px 10px;
-      border-radius: 10px;
-      border: 1px solid #eee;
-      font-size: 14px;
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    ul li {
+      padding: 4px 0;
     }
   </style>
 </head>
 <body>
-  <h1>🪣 Our Bucket List</h1>
+
+  <h1 style="text-align:center; font-size: 2rem;">🎯 Our Bucket Lists</h1>
 
   <div class="grid">
     <div class="bucket">
@@ -98,7 +83,7 @@
     </div>
 
     <div class="bucket">
-      <h2>🍽️ I can't wait to eat:</h2>
+      <h2>🍜 I can't wait to eat:</h2>
       <form data-cat="eat">
         <input placeholder="Add food" required />
         <button>+</button>
@@ -107,7 +92,7 @@
     </div>
 
     <div class="bucket">
-      <h2>📍 I can't wait to go to:</h2>
+      <h2>🌍 I can't wait to go to:</h2>
       <form data-cat="go">
         <input placeholder="Add place" required />
         <button>+</button>
@@ -141,7 +126,7 @@
         .eq("category", cat);
 
       if (error) {
-        console.error("Fetch error:", error);
+        console.error(`Error loading category ${cat}:`, error.message);
         return;
       }
 
@@ -165,14 +150,16 @@
           .insert([{ category: cat, description: val }]);
 
         if (error) {
-          console.error("Insert error:", error);
-        } else {
-          input.value = "";
-          loadCategory(cat);
+          console.error("Insert error:", error.message);
+          return;
         }
+
+        input.value = "";
+        loadCategory(cat);
       });
     });
 
+    // Load all categories
     ["watch", "eat", "go", "do"].forEach(loadCategory);
   </script>
 </body>
