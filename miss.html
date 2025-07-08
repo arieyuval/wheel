@@ -138,16 +138,18 @@
 
       WordCloud(canvas, {
         list,
-        gridSize: 2, // smaller = denser cloud
-        weightFactor: (count) => count * 10, // bigger multiplier = fills box better
-        rotateRatio: 0.5,
+        gridSize: 1.5, // smaller = denser cloud
+        weightFactor: (count) => 10 + count * 10, // bigger multiplier = fills box better
+        rotateRatio: 0.6,
         rotationSteps: 4,
         backgroundColor: "#ffe9f3",
-        color: () => `hsl(${Math.random() * 360}, 70%, 50%)`,
+        color: () => `hsl(${Math.random() * 360}, 70%, 45%)`,
         drawOutOfBound: false,
         shape: "circle",
         shuffle: true,
         fontFamily: "'Comic Neue', 'Comic Sans MS', cursive",
+        ellipticity: 1,
+        minSize: 14,
       });
     }
 
