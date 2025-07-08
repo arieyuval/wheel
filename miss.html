@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>I Miss You</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body style="font-family: 'Comic Neue', 'Comic Sans MS', 'Comic Sans', cursive; text-align:center; padding:20px;">
+
+  <h1 id="countdown" style="font-size:48px;"></h1>
+  <h2 style="font-size:32px; margin-top:20px;">What we miss most</h2>
+
+  <form id="word-form">
+    <input type="text" id="word-input" placeholder="Add something you miss" required 
+           style="padding:10px; width:80%; max-width:400px; margin-top:20px;">
+    <button type="submit" style="padding:10px 20px; margin-left:10px;">Add</button>
+  </form>
+
+  <div id="word-cloud" style="margin-top:30px; width:90%; max-width:600px; margin:auto;"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Supabase init
+    const SUPABASE_URL = "https://mudusurnywurspztmtha.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11ZHVzdXJueXd1cnNwenRtdGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MzgwNDEsImV4cCI6MjA2NzUxNDA0MX0.F2mr6cmfcNzChGrqHRVyHlSsEJ2yEBkSaJBZr6547Sc";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // 1. Countdown
+    const targetDate = new Date("2026-01-01T00:00:00");
+    const countdownEl = document.getElementById("countdown");
+    function updateCountdown() {
+      const now = new Date();
+      const diff = targetDate - now;
+      if (diff <= 0) {
+        countdownEl.textContent = "We're there!";
+        return;
+      }
+      const days = Math.floor(diff / 86400000),
+            hrs  = Math.floor((diff % 86400000) / 3600000),
+            mins = Math.floor((diff % 3600000) / 60000),
+            secs = Math.floor((diff % 60000) / 1000);
+      countdownEl.textContent = `${days}d ${hrs}h ${mins}m ${secs}s`;
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // 2. Word Cloud
+    const form = document.getElementById("word-form");
+    const input = document.getElementById("word-input");
+    const cloudDiv = document.getElementById("word-cloud");
+
+    async function fetchWords() {
+      const { data, error } = await supabase
+        .from("word_cloud_entries")
+        .select("word, count");
+      return data || [];
+    }
+
+    function renderCloud(words) {
+      cloudDiv.innerHTML = "";
+      words.sort((a,b) => b.count - a.count);
+      const max = words[0]?.count || 1;
+      words.forEach(({ word, count }) => {
+        const size = 16 + (count / max) * 40;
+        const span = document.createElement("span");
+        span.textContent = word;
+        span.style.fontSize = size + "px";
+        span.style.margin = "5px";
+        span.style.color = `hsl(${Math.random()*360},60%,40%)`;
+        cloudDiv.appendChild(span);
+      });
+    }
+
+    async function loadAndShowWords() {
+      const words = await fetchWords();
+      renderCloud(words);
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const w = input.value.trim();
+      if (!w) return;
+      await supabase.rpc("increment_word", { w });
+      input.value = "";
+      loadAndShowWords();
+    });
+
+    loadAndShowWords();
+  </script>
+</body>
+</html>

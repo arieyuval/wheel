@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bucket Lists</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body style="font-family: 'Comic Neue', 'Comic Sans MS', 'Comic Sans', cursive; padding:20px; display:grid; grid-template-columns:1fr; gap:30px;">
+
+  <div class="bucket">
+    <h2>I can't wait to watch:</h2>
+    <form data-cat="watch">
+      <input placeholder="Add show/movie" required>
+      <button>Add</button>
+    </form>
+    <ul data-list-watch style="list-style:none; padding:0;"></ul>
+  </div>
+
+  <div class="bucket">
+    <h2>I can't wait to eat:</h2>
+    <form data-cat="eat">
+      <input placeholder="Add food" required>
+      <button>Add</button>
+    </form>
+    <ul data-list-eat style="list-style:none; padding:0;"></ul>
+  </div>
+
+  <div class="bucket">
+    <h2>I can't wait to go to:</h2>
+    <form data-cat="go">
+      <input placeholder="Add place" required>
+      <button>Add</button>
+    </form>
+    <ul data-list-go style="list-style:none; padding:0;"></ul>
+  </div>
+
+  <div class="bucket">
+    <h2>I can't wait to do:</h2>
+    <form data-cat="do">
+      <input placeholder="Add activity" required>
+      <button>Add</button>
+    </form>
+    <ul data-list-do style="list-style:none; padding:0;"></ul>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://mudusurnywurspztmtha.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11ZHVzdXJueXd1cnNwenRtdGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MzgwNDEsImV4cCI6MjA2NzUxNDA0MX0.F2mr6cmfcNzChGrqHRVyHlSsEJ2yEBkSaJBZr6547Sc";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function loadCategory(cat) {
+      const ul = document.querySelector(`[data-list-${cat}]`);
+      ul.innerHTML = "";
+      const { data } = await supabase
+        .from("bucket_list_items")
+        .select("description")
+        .eq("category", cat);
+      data.forEach(({ description }) => {
+        const li = document.createElement("li");
+        li.textContent = description;
+        ul.appendChild(li);
+      });
+    }
+
+    document.querySelectorAll("form[data-cat]").forEach(form => {
+      const cat = form.dataset.cat;
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const val = form.querySelector("input").value.trim();
+        if (!val) return;
+        await supabase.from("bucket_list_items").insert([{ category: cat, description: val }]);
+        form.reset();
+        loadCategory(cat);
+      });
+    });
+
+    // On load, fetch all
+    ["watch","eat","go","do"].forEach(loadCategory);
+  </script>
+</body>
+</html>
