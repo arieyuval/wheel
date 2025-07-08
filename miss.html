@@ -138,8 +138,8 @@
 
       WordCloud(canvas, {
         list,
-        gridSize: 6,
-        weightFactor: (size) => size * 2,
+        gridSize: 4,
+        weightFactor: (count) => Math.pow(count, 1.5),
         rotateRatio: 0.5,
         rotationSteps: 4,
         backgroundColor: "#ffe9f3",
